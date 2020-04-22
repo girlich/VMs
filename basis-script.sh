@@ -37,7 +37,8 @@ case $1 in
         ;;
 
   5)    #attach interface to the bridge
-        sudo virsh attach-interface --domain $2 --type bridge --source $3 --model virtio $
+        sudo virsh attach-interface --domain $2 --type bridge --source $3 --model virtio --config --live
+
         ;;
 
   6)    #delete bridge
