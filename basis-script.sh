@@ -36,12 +36,13 @@ case $1 in
         ;;
 
   5)    #attach interface to the bridge
-        sudo virsh attach-interface --domain $2 --type network --source $3 --model virtio --mac $4 --config --live
+        sudo virsh attach-interface --domain $2 --type network --source $3 --model virtio$
         ;;
 
-  6)    #detach -interface
-        sudo virsh attach-interface --domain $2 --type network --mac $3 --config
+  6)    #detach interface
+        sudo virsh detach-interface --domain $2 --type network --mac $3 --config
         ;;
+
 
   7)    #add a dhcp static host entry to the network
         virsh net-update $2 add ip-dhcp-host \
