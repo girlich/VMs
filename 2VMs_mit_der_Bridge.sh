@@ -2,7 +2,7 @@
 
 #create 1. VM and interface
 
-bash basis-script.sh 1 VM1
+./basis-script.sh 1 VM1
 sleep 30
 bash basis-script.sh 4 VM1 08:00:00:00:00:01
 
