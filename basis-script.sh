@@ -12,6 +12,7 @@ case $1 in
         printf  "<network>
                   <name>$2</name>
                   <bridge name='$2' stp='on' delay='0'/>
+                    <forward mode = 'route' />
                   <ip address='$3' netmask='$4'>
                     <dhcp>
                       <range start='$5' end='$6'/>
