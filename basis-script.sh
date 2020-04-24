@@ -38,11 +38,9 @@ case $1 in
   5)    #attach interface to the bridge
         sudo virsh attach-interface --domain $2 --type network --source $3 --model virtio$
         ;;
-
-  6)    #detach interface
+  6)    #detach -interface
         sudo virsh detach-interface --domain $2 --type network --mac $3 --config
         ;;
-
 
   7)    #add a dhcp static host entry to the network
         virsh net-update $2 add ip-dhcp-host \
@@ -51,10 +49,19 @@ case $1 in
            --live --config
         ;;
 
-  8)    #delete bridge
+  8)    #enable ip forwarding
+        uvt-kvm ssh $2 "sudo  chmod 777 /etc/sysctl.conf"
+        uvt-kvm ssh $2 "sudo echo net.ipv4.ip_forward = 1 >> /etc/sysctl.conf"
+        sudo /etc/init.d/procps restart
+        ;;
+
+  9)    #delete bridge
         sudo ifconfig $2 down
         sudo brctl delbr $2
         sudo virsh net-destroy $2
         sudo virsh net-undefine $2
+        sudo rm $2.xml
         ;;
+
+
 esac
