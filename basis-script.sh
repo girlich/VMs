@@ -24,8 +24,9 @@ case $1 in
         virsh net-autostart $2
         ;;
 
-
   4)    #VM interface
+        if [[ $3 -eq 7 ]]
+        then
         uvt-kvm ssh $2 'sudo apt-get install ifupdown'
         uvt-kvm ssh $2 "sudo chmod  777 /etc/network/interfaces"
         uvt-kvm ssh $2 "sudo echo auto ens7 >> /etc/network/interfaces"
@@ -33,8 +34,13 @@ case $1 in
         uvt-kvm ssh $2 "sudo echo        >> /etc/network/interfaces"
         uvt-kvm ssh $2 "sudo echo auto lo >> /etc/network/interfaces"
         uvt-kvm ssh $2 "sudo echo iface lo inet loopback >> /etc/network/interfaces"
+        else
+        uvt-kvm ssh $2 "sudo echo auto ens$3 >> /etc/network/interfaces"
+        uvt-kvm ssh $2 "sudo echo iface ens$3 inet dhcp >> /etc/network/interfaces"
+        fi
         ;;
 
+  
   5)    #attach interface to the bridge
         sudo virsh attach-interface --domain $2 --type network --source $3 --model virtio$
         ;;
