@@ -1,8 +1,18 @@
 #!/bin/bash
+
+set -x
+
 case $1 in
-  1)    #create VM
+  create-vm)    #create VM
         uvt-kvm create $2 release=bionic
         ;;
+
+  remove-vm)
+	virsh destroy $2
+	virsh undefine $2
+	virsh vol-delete --pool uvtool $2.qcow
+	virsh vol-delete --pool uvtool $2-ds.qcow
+	;;
 
   2)    #destroy VM
         uvt-kvm destroy  $2 

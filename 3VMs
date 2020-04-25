@@ -10,13 +10,19 @@ VM2_1_IP=10.10.10.12
 VM2_3_IP=10.10.20.12
 VM3_IP=10.10.20.13
 
+set -x
+
+case $1 in
+	start)
+
 #create 1. VM and interface
-./basis-script.sh 1 VM1
+./basis-script.sh create-vm VM1
+exit
 sleep 30
 ./basis-script.sh 4 VM1 7
 
 #create 2. VM (router) and interfaces
-./basis-script.sh 1 VM2
+./basis-script.sh create-vm VM2
 sleep 30
 ./basis-script.sh 4 VM2 7
 ./basis-script.sh 4 VM2 8
@@ -25,7 +31,7 @@ sleep 30
 ./basis-script.sh 8 VM2
 
 #create 3. VM and interface
-./basis-script.sh 1 VM3 7
+./basis-script.sh create-vm VM3 7
 sleep 30
 ./basis-script.sh 4 VM3 7
 
@@ -46,4 +52,13 @@ sleep 30
 ./basis-script.sh 5 VM2 br-1 ${VM2_1_MAC}
 ./basis-script.sh 5 VM2 br-2 ${VM2_3_MAC}
 ./basis-script.sh 5 VM3 br-2 ${VM3_MAC}
+
+	;;
+
+	stop)
+		./basis-script.sh remove-vm VM1
+		./basis-script.sh remove-vm VM2
+		./basis-script.sh remove-vm VM3
+	;;
+esac
 

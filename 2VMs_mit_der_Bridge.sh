@@ -6,7 +6,7 @@ VM1_IP=10.10.80.11
 VM2_IP=10.10.80.12
 
 #create 1. VM and interface
-./basis-script.sh 1 VM1
+./basis-script.sh create-vm VM1
 sleep 30
 ./basis-script.sh 4 VM1
 
