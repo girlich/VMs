@@ -5,6 +5,7 @@ set -x
 case $1 in
   create-vm)    #create VM
         uvt-kvm create $2 release=bionic
+	uvt-kvm wait $2
         ;;
 
   remove-vm)
@@ -18,7 +19,7 @@ case $1 in
         uvt-kvm destroy  $2 
         ;;
 
-  3)    #create bridge
+  create-bridge)    #create bridge
         printf  "<network>
                   <name>$2</name>
                   <bridge name='$2' stp='on' delay='0'/>
@@ -52,14 +53,14 @@ case $1 in
         ;;
 
   
-  5)    #attach interface to the bridge
-        sudo virsh attach-interface --domain $2 --type network --source $3 --model virtio$
+  attach-interface)    #attach interface to the bridge
+        virsh attach-interface --domain $2 --type network --source $3 --mac $4 --model virtio
         ;;
   6)    #detach -interface
-        sudo virsh detach-interface --domain $2 --type network --mac $3 --config
+        virsh detach-interface --domain $2 --type network --mac $3 --config
         ;;
 
-  7)    #add a dhcp static host entry to the network
+  add-dhcp)    #add a dhcp static host entry to the network
         virsh net-update $2 add ip-dhcp-host \
           "<host mac='$3' \
            ip='$4' />" \
@@ -72,12 +73,12 @@ case $1 in
         sudo /etc/init.d/procps restart
         ;;
 
-  9)    #delete bridge
-        sudo ifconfig $2 down
-        sudo brctl delbr $2
-        sudo virsh net-destroy $2
-        sudo virsh net-undefine $2
-        sudo rm $2.xml
+  delete-bridge)    #delete bridge
+        # sudo ifconfig $2 down
+        # sudo brctl delbr $2
+        virsh net-destroy $2
+        virsh net-undefine $2
+        rm $2.xml
         ;;
 
 

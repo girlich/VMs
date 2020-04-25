@@ -15,15 +15,38 @@ set -x
 case $1 in
 	start)
 
-#create 1. VM and interface
-./basis-script.sh create-vm VM1
+		#create bridge between 1. and 2. VM
+		./basis-script.sh create-bridge br-1 10.10.10.1 255.255.255.0 10.10.10.10 10.10.10.80
+
+		#create bridge between 2. and 3. VM
+		./basis-script.sh create-bridge br-2 10.10.20.1 255.255.255.0 10.10.20.10 10.10.20.80
+
+		#add a dhcp static host entry to the network
+		./basis-script.sh add-dhcp br-1 ${VM1_MAC} ${VM1_IP}
+		./basis-script.sh add-dhcp br-1 ${VM2_1_MAC} ${VM2_1_IP}
+		./basis-script.sh add-dhcp br-2 ${VM2_3_MAC} ${VM2_3_IP}
+		./basis-script.sh add-dhcp br-2 ${VM3_MAC} ${VM3_IP}
+
+		#create 1. VM
+		./basis-script.sh create-vm VM1
+
+		#create 2. VM (router)
+		./basis-script.sh create-vm VM2
+
+		#create 3. VM and interface
+		./basis-script.sh create-vm VM3
+
+		# Attach interfaces to the bridges
+		./basis-script.sh attach-interface VM1 br-1 ${VM1_MAC}
+		./basis-script.sh attach-interface VM2 br-1 ${VM2_1_MAC}
+		./basis-script.sh attach-interface VM2 br-2 ${VM2_3_MAC}
+		./basis-script.sh attach-interface VM3 br-2 ${VM3_MAC}
+
 exit
-sleep 30
 ./basis-script.sh 4 VM1 7
 
 #create 2. VM (router) and interfaces
 ./basis-script.sh create-vm VM2
-sleep 30
 ./basis-script.sh 4 VM2 7
 ./basis-script.sh 4 VM2 8
 
@@ -32,26 +55,7 @@ sleep 30
 
 #create 3. VM and interface
 ./basis-script.sh create-vm VM3 7
-sleep 30
 ./basis-script.sh 4 VM3 7
-
-#create bridge between 1. and 2. VM
-./basis-script.sh 3 br-1 10.10.10.1 255.255.255.0 10.10.10.10 10.10.10.80
-
-#create bridge between 2. and 3. VM
-./basis-script.sh 3 br-2 10.10.20.1 255.255.255.0 10.10.20.10 10.10.20.80
-
-#add a dhcp static host entry to the network
-./basis-script.sh 7 br-1 ${VM1_MAC} ${VM1_IP}
-./basis-script.sh 7 br-1 ${VM2_1_MAC} ${VM2_1_IP}
-./basis-script.sh 7 br-2 ${VM2_3_MAC} ${VM2_3_IP}
-./basis-script.sh 7 br-2 ${VM3_MAC} ${VM3_IP}
-
-#attach interfaces to bridges
-./basis-script.sh 5 VM1 br-1 ${VM1_MAC}
-./basis-script.sh 5 VM2 br-1 ${VM2_1_MAC}
-./basis-script.sh 5 VM2 br-2 ${VM2_3_MAC}
-./basis-script.sh 5 VM3 br-2 ${VM3_MAC}
 
 	;;
 
@@ -59,6 +63,8 @@ sleep 30
 		./basis-script.sh remove-vm VM1
 		./basis-script.sh remove-vm VM2
 		./basis-script.sh remove-vm VM3
+		./basis-script.sh delete-bridge br-1
+		./basis-script.sh delete-bridge br-2
 	;;
 esac
 

@@ -16,7 +16,7 @@ sleep 30
 ./basis-script.sh 4 VM2 
 
 #create bridge
-./basis-script.sh 3 br-1 10.10.80.1 255.255.255.0 10.10.80.10 10.10.80.80
+./basis-script.sh create-bridge br-1 10.10.80.1 255.255.255.0 10.10.80.10 10.10.80.80
 
 #add a dhcp static host entry to the network
 ./basis-script.sh 7 br-1 ${VM1_MAC} ${VM1_IP}
