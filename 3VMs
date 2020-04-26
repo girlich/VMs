@@ -5,8 +5,10 @@ VM2_1_MAC=08:00:00:00:00:12
 VM2_3_MAC=08:00:00:00:00:32
 VM3_MAC=08:00:00:00:00:03
 
+SN_1=10.10.10.0/24
 VM1_IP=10.10.10.11
 VM2_1_IP=10.10.10.12
+SN_2=10.10.20.0/24
 VM2_3_IP=10.10.20.12
 VM3_IP=10.10.20.13
 
@@ -49,11 +51,22 @@ case $1 in
 		./basis-script.sh configure-interface VM2 7
 		./basis-script.sh configure-interface VM2 8
 
+		# Interface in VM3
+		./basis-script.sh configure-interface VM3 7
+
 		#enable ip forwarding
 		./basis-script.sh enable-ip-forwarding VM2
 
-		# Interface in VM3
-		./basis-script.sh configure-interface VM3 7
+		# Routing in VM1 to reach VM3
+		./basis-script.sh add-route VM1 ${SN_2} ${VM2_1_IP} 7
+
+		# Routing in VM3 to reach VM1
+		./basis-script.sh add-route VM3 ${SN_1} ${VM2_3_IP} 7
+
+		# Reset all VMs
+		./basis-script.sh reset-vm VM1
+		./basis-script.sh reset-vm VM2
+		./basis-script.sh reset-vm VM3
 
 	;;
 

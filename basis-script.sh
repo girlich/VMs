@@ -8,16 +8,13 @@ case $1 in
 	uvt-kvm wait $2
         ;;
 
-  remove-vm)
-	virsh destroy $2
-	virsh undefine $2
-	virsh vol-delete --pool uvtool $2.qcow
-	virsh vol-delete --pool uvtool $2-ds.qcow
-	;;
-
-  2)    #destroy VM
+  remove-vm)    #destroy VM
         uvt-kvm destroy  $2 
         ;;
+
+  reset-vm)
+	uvt-kvm ssh $2 "sudo init 6"
+	;;
 
   create-bridge)    #create bridge
         printf  "<network>
@@ -41,16 +38,19 @@ case $1 in
         then
 		uvt-kvm ssh $2 'sudo apt-get install ifupdown'
 		uvt-kvm ssh $2 "sudo chmod  777 /etc/network/interfaces"
-		uvt-kvm ssh $2 "sudo echo auto ens7 >> /etc/network/interfaces"
-		uvt-kvm ssh $2 "sudo echo iface ens7 inet dhcp >> /etc/network/interfaces"
+
 		uvt-kvm ssh $2 "sudo echo        >> /etc/network/interfaces"
 		uvt-kvm ssh $2 "sudo echo auto lo >> /etc/network/interfaces"
 		uvt-kvm ssh $2 "sudo echo iface lo inet loopback >> /etc/network/interfaces"
-	else
-		uvt-kvm ssh $2 "sudo echo auto ens$3 >> /etc/network/interfaces"
-		uvt-kvm ssh $2 "sudo echo iface ens$3 inet dhcp >> /etc/network/interfaces"
+
+		uvt-kvm ssh $2 "sudo echo        >> /etc/network/interfaces"
+		uvt-kvm ssh $2 "sudo echo auto ens3 >> /etc/network/interfaces"
+		uvt-kvm ssh $2 "sudo echo iface ens3 inet dhcp >> /etc/network/interfaces"
 	fi
-	uvt-kvm ssh $2 "sudo ifdown -a ; sudo ifup -a"
+	uvt-kvm ssh $2 "sudo echo        >> /etc/network/interfaces"
+	uvt-kvm ssh $2 "sudo echo auto ens$3 >> /etc/network/interfaces"
+	uvt-kvm ssh $2 "sudo echo iface ens$3 inet dhcp >> /etc/network/interfaces"
+	uvt-kvm ssh $2 "sudo mv /etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml.unused"
 	;;
 
   
@@ -73,6 +73,10 @@ case $1 in
         uvt-kvm ssh $2 "sudo echo net.ipv4.ip_forward = 1 >> /etc/sysctl.conf"
         uvt-kvm ssh $2 "sudo /etc/init.d/procps restart"
         ;;
+
+  add-route) # add route, danger: acts on the last interface!
+	uvt-kvm ssh $2 "sudo echo post-up ip route add $3 via $4 dev ens$5 >> /etc/network/interfaces"
+	;;
 
   delete-bridge)    #delete bridge
         # sudo ifconfig $2 down
