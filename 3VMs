@@ -33,7 +33,7 @@ case $1 in
 		#create 2. VM (router)
 		./basis-script.sh create-vm VM2
 
-		#create 3. VM and interface
+		#create 3. VM
 		./basis-script.sh create-vm VM3
 
 		# Attach interfaces to the bridges
@@ -42,20 +42,18 @@ case $1 in
 		./basis-script.sh attach-interface VM2 br-2 ${VM2_3_MAC}
 		./basis-script.sh attach-interface VM3 br-2 ${VM3_MAC}
 
-exit
-./basis-script.sh 4 VM1 7
+		# Interface in VM1
+		./basis-script.sh configure-interface VM1 7
 
-#create 2. VM (router) and interfaces
-./basis-script.sh create-vm VM2
-./basis-script.sh 4 VM2 7
-./basis-script.sh 4 VM2 8
+		# Interfaces in VM2
+		./basis-script.sh configure-interface VM2 7
+		./basis-script.sh configure-interface VM2 8
 
-#enable ip forwarding
-./basis-script.sh 8 VM2
+		#enable ip forwarding
+		./basis-script.sh enable-ip-forwarding VM2
 
-#create 3. VM and interface
-./basis-script.sh create-vm VM3 7
-./basis-script.sh 4 VM3 7
+		# Interface in VM3
+		./basis-script.sh configure-interface VM3 7
 
 	;;
 

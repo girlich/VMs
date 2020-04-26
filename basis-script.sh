@@ -36,25 +36,26 @@ case $1 in
         virsh net-autostart $2
         ;;
 
-  4)    #VM interface
+  configure-interface)    #VM interface
         if [[ $3 -eq 7 ]]
         then
-        uvt-kvm ssh $2 'sudo apt-get install ifupdown'
-        uvt-kvm ssh $2 "sudo chmod  777 /etc/network/interfaces"
-        uvt-kvm ssh $2 "sudo echo auto ens7 >> /etc/network/interfaces"
-        uvt-kvm ssh $2 "sudo echo iface ens7 inet dhcp >> /etc/network/interfaces"
-        uvt-kvm ssh $2 "sudo echo        >> /etc/network/interfaces"
-        uvt-kvm ssh $2 "sudo echo auto lo >> /etc/network/interfaces"
-        uvt-kvm ssh $2 "sudo echo iface lo inet loopback >> /etc/network/interfaces"
-        else
-        uvt-kvm ssh $2 "sudo echo auto ens$3 >> /etc/network/interfaces"
-        uvt-kvm ssh $2 "sudo echo iface ens$3 inet dhcp >> /etc/network/interfaces"
-        fi
-        ;;
+		uvt-kvm ssh $2 'sudo apt-get install ifupdown'
+		uvt-kvm ssh $2 "sudo chmod  777 /etc/network/interfaces"
+		uvt-kvm ssh $2 "sudo echo auto ens7 >> /etc/network/interfaces"
+		uvt-kvm ssh $2 "sudo echo iface ens7 inet dhcp >> /etc/network/interfaces"
+		uvt-kvm ssh $2 "sudo echo        >> /etc/network/interfaces"
+		uvt-kvm ssh $2 "sudo echo auto lo >> /etc/network/interfaces"
+		uvt-kvm ssh $2 "sudo echo iface lo inet loopback >> /etc/network/interfaces"
+	else
+		uvt-kvm ssh $2 "sudo echo auto ens$3 >> /etc/network/interfaces"
+		uvt-kvm ssh $2 "sudo echo iface ens$3 inet dhcp >> /etc/network/interfaces"
+	fi
+	uvt-kvm ssh $2 "sudo ifdown -a ; sudo ifup -a"
+	;;
 
   
   attach-interface)    #attach interface to the bridge
-        virsh attach-interface --domain $2 --type network --source $3 --mac $4 --model virtio
+	virsh attach-interface --domain $2 --type network --source $3 --mac $4 --model virtio --config --live
         ;;
   6)    #detach -interface
         virsh detach-interface --domain $2 --type network --mac $3 --config
@@ -67,10 +68,10 @@ case $1 in
            --live --config
         ;;
 
-  8)    #enable ip forwarding
+  enable-ip-forwarding)    #enable ip forwarding
         uvt-kvm ssh $2 "sudo  chmod 777 /etc/sysctl.conf"
         uvt-kvm ssh $2 "sudo echo net.ipv4.ip_forward = 1 >> /etc/sysctl.conf"
-        sudo /etc/init.d/procps restart
+        uvt-kvm ssh $2 "sudo /etc/init.d/procps restart"
         ;;
 
   delete-bridge)    #delete bridge
